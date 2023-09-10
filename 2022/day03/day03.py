@@ -1,28 +1,30 @@
+#!/usr/bin/env python3
 """
 https://adventofcode.com/2022/day/3
 """
 
+import os
 
-def score(char: str) -> int:
-    if char.islower():
-        return ord(char) - 96
-    return ord(char) - 38
+
+with open(os.path.join(os.path.dirname(__file__), "rucksacks.txt"), encoding="utf-8") as file:
+    rucksacks = file.read().splitlines()
+
+
+def priority(char: str) -> int:
+    """Calculate the priority of a character"""
+    return ord(char) - 96 if char.islower() else ord(char) - 38
 
 
 # Part 1
-with open("rucksacks.txt", encoding="utf-8") as file:
-    rucksacks = file.read().splitlines()
-
-part1_total = 0
-for rucksack in rucksacks:
-    for letter in set(rucksack[:int(len(rucksack) / 2)]).intersection(rucksack[int(len(rucksack) / 2):]):
-        part1_total += score(letter)
-print(f"Sum of priorities is {part1_total}")
+total_part1 = sum(
+    sum(map(priority, shared))
+    for shared in (set(rs[: len(rs) // 2]).intersection(rs[len(rs) // 2 :]) for rs in rucksacks)
+)
+print(f"Sum of priorities is {total_part1}")
 
 # Part 2
-part2_total = 0
-for i in range(0, len(rucksacks), 3):
-    group = rucksacks[i:i + 3]
-    intersection = set(group[0]).intersection(group[1]).intersection(group[2])
-    part2_total += score(set(group[0]).intersection(group[1]).intersection(group[2]).pop())
-print(f"Sum of badge priorities is {part2_total}")
+total_part2 = sum(
+    sum(map(priority, set.intersection(*list(map(set, group))).pop()))
+    for group in (rucksacks[i : i + 3] for i in range(0, len(rucksacks), 3))
+)
+print(f"Sum of badge priorities is {total_part2}")
